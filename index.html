@@ -96,7 +96,7 @@ nav.solid{top:.9rem;left:1.1rem;right:1.1rem;padding:.95rem 1.8rem;background:rg
 /* HERO */
 .hero{min-height:100vh;position:relative;display:flex;align-items:flex-end;overflow:hidden;padding:0;background:#1A1409}
 .hero-video-wrap{position:absolute;inset:0;z-index:0}
-.hero-video-wrap video{width:100%;height:100%;object-fit:cover;object-position:50% 12%;opacity:1;filter:contrast(1.08) brightness(1.04) saturate(1.12);animation:kenburns 22s ease-in-out infinite alternate}
+.hero-video-wrap video{width:100%;height:100%;object-fit:cover;object-position:50% 12%;opacity:1;filter:contrast(1.08) brightness(1.04) saturate(1.12);transform:scale(1.08);transition:transform .3s cubic-bezier(.16,1,.3,1)}
 @keyframes kenburns{0%{transform:scale(1)}100%{transform:scale(1.07)}}
 .hero-scrim{position:absolute;inset:0;z-index:1;
   background:
@@ -114,7 +114,13 @@ nav.solid{top:.9rem;left:1.1rem;right:1.1rem;padding:.95rem 1.8rem;background:rg
 @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px)}}
 @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-35px,25px)}}
 @keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(25px,-20px)}}
-.hero-content{position:relative;z-index:2;width:100%;padding:9rem 5% 5rem;display:grid;grid-template-columns:1fr;gap:2rem;align-items:flex-end}
+.hero-content{position:relative;z-index:2;width:100%;padding:9rem 5% 5rem;display:grid;grid-template-columns:1fr;gap:2rem;align-items:flex-end;perspective:1200px}
+.hero-tilt{transform-style:preserve-3d;transition:transform .3s cubic-bezier(.16,1,.3,1);will-change:transform}
+.hero-tilt .hero-eyebrow{transform:translateZ(30px)}
+.hero-tilt .hero-h1{transform:translateZ(50px)}
+.hero-tilt .hero-roles{transform:translateZ(26px)}
+.hero-tilt .hero-desc{transform:translateZ(20px)}
+.hero-tilt .hero-btns{transform:translateZ(32px)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .hero-role-badge{position:absolute;top:6.6rem;left:5%;z-index:2;font-family:var(--mono);font-weight:600;font-size:1.05rem;letter-spacing:.22em;text-transform:uppercase;color:#FBF6EA;display:flex;align-items:center;gap:.85rem;opacity:0;animation:fadeUp .8s cubic-bezier(.16,1,.3,1) both .0s}
 .hero-role-badge .accent-word{color:#3FE0A0;text-shadow:0 0 18px rgba(63,224,160,.55)}
@@ -424,7 +430,7 @@ footer a:hover{color:var(--blue2)}
   <div class="hero-smoke"><span class="s1"></span><span class="s2"></span><span class="s3"></span></div>
   <div class="hero-role-badge">Software <span class="accent-word">Engineer</span></div>
   <div class="hero-content">
-    <div>
+    <div class="hero-tilt" id="heroTilt">
       <div class="hero-eyebrow"><span class="tag">[ Available ]</span> Dhaka, BD</div>
       <h1 class="hero-h1">
         <span>MD. Tuhinuzzaman</span>
@@ -932,6 +938,30 @@ document.querySelectorAll('.pf-btn').forEach(btn=>{
 });
 
 
+
+/* 3D HERO TILT */
+(function(){
+  const hero=document.getElementById('home');
+  const tilt=document.getElementById('heroTilt');
+  const vid=document.querySelector('.hero-video-wrap video');
+  if(!hero||!tilt)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(window.matchMedia('(max-width: 768px)').matches)return;
+  let rx=0,ry=0,tx=0,ty=0;
+  hero.addEventListener('mousemove',e=>{
+    const r=hero.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width-0.5;
+    const py=(e.clientY-r.top)/r.height-0.5;
+    ry=px*10; rx=-py*8; tx=px*-14; ty=py*-10;
+  });
+  hero.addEventListener('mouseleave',()=>{ry=0;rx=0;tx=0;ty=0});
+  function loop(){
+    tilt.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+    if(vid)vid.style.transform=`translate(${tx}px,${ty}px) scale(1.08)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 
 /* TYPEWRITER */
 (function(){
